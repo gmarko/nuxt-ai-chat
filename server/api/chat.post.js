@@ -24,8 +24,16 @@ export default defineEventHandler(async (event) => {
 	});
 
 	const res = await req.json();
-	const result = res.choices[0];
-	return {
-		message: result.text
-	};
+
+	try {
+		const result = res.choices[0];
+		return {
+			message: 'Éxito',
+			data: result
+		};
+	} catch (error) {
+		return {
+			message: 'Ha ocurrido un error'	
+		};
+	}	
 });

@@ -2,7 +2,7 @@
 	const messages = ref([
 		{
 			role: 'AI',
-			message: 'Hello! How can I help you?'
+			message: 'Hola, puedes hacerme una pregunta'
 		}
 	]);
 	const loading = ref(false);
@@ -45,20 +45,40 @@
 			});
 		}
 
-		loading.value = false;
-		scrollToEnd();
+		const sendFile = async (event) => {
+		const file = event.target.elements[0].files[0];
+		const formData = new FormData();
+		formData.append('file', file);			formData.append('file', file);
+
+			const res = await fetch(`/api/upload`, {
+				method: 'POST',
+				body: formData
+			});
+
+			if (res.status === 200) {
+				const response = await res.json();
+				messages.value.push({
+					role: 'AI',
+					message: response?.message
+				});
+			} else {
+				messages.value.push({
+					role: 'AI',
+					message: 'Lo siento, ocurrió un error en subida.'
+				});
+			}
+
+			loading.value = false;
+			scrollToEnd();
+		};
 	};
 </script>
 
 <template>
 	<div class="max-w-xl mx-auto text-black">
-		<a
-			href="https://vercel.com/templates/next.js/blob-sveltekit"
-			class="flex justify-center px-10 py-2 mx-auto space-x-1 text-sm font-medium text-center text-gray-600 transition-all rounded-full shadow-sm group bg-white/30 ring-1 ring-gray-900/5 hover:shadow-lg active:shadow-sm"
-		>
-			Deploy your own to Vercel
-		</a>
-		<h1 class="my-8 text-5xl font-bold text-center text-black">AI Chatbot</h1>
+		<img src="~/assets/icona.webp" alt="Icon" class="absolute top-0 left-0 w-20 h-20 bg-transparent">
+		
+		<h1 class="my-6 text-5xl font-bold text-center text-blue-900 ">Specialisterne AI</h1>
 		<div class="max-w-xl mx-auto">
 			<div class="bg-white rounded-md shadow h-[60vh] flex flex-col justify-between">
 				<div class="h-full overflow-auto chat-messages">
@@ -83,13 +103,50 @@
 						<input
 							v-model="message"
 							type="text"
-							placeholder="Type here..."
+							placeholder="Escribe aquí..."
 							class="w-full p-1 text-sm text-black bg-transparent bg-gray-100 border rounded-md shadow border-white/40 grow"
 						/>
 						<button
 							:disabled="loading"
 							type="submit"
-							class="flex items-center justify-center flex-none w-10 h-10 ml-2 bg-green-500 rounded-full"
+							class="flex items-center justify-center flex-none w-10 h-10 ml-2 bg-blue-500
+							  rounded-full"
+						>
+							<svg
+								width="24"
+								height="24"
+								viewBox="0 0 24 24"
+								fill="none"
+								xmlns="http://www.w3.org/2000/svg"
+							>
+								<path
+									d="M22 2L11 13"
+									stroke="white"
+									stroke-width="1.5"
+									stroke-linecap="round"
+									stroke-linejoin="round"
+								/>
+								<path
+									d="M22 2L15 22L11 13L2 9L22 2Z"
+									stroke="white"
+									stroke-width="1.5"
+									stroke-linecap="round"
+									stroke-linejoin="round"
+								/>
+							</svg>
+						</button>
+					</div>
+				</form >
+				<form @submit.prevent="sendFile">
+					<div class="flex items-center w-full p-4">
+						<input
+							type="file"
+							class="w-full p-1 text-sm text-black bg-transparent bg-gray-100 border rounded-md shadow border-white/40 grow"
+						/>
+						<button
+							type="submit"
+							class="flex items-center justify-center flex-none w-10 h-10 ml-2 bg-blue-500
+							  rounded-full"
 						>
 							<svg
 								width="24"
@@ -116,41 +173,14 @@
 						</button>
 					</div>
 				</form>
+				
+				</div>
 			</div>
 		</div>
 		<div class="flex flex-col justify-center w-full my-4">
-			<div class="flex items-center justify-center my-2">
-				<span>Built with</span>
-				<a
-					href="https://openai.com/blog/gpt-3-apps"
-					class="flex items-center mx-1 font-medium underline transition-colors underline-offset-4 hover:text-black/70"
-				>
-					<p>gpt-3</p>
-				</a>
-				<span>and</span>
-				<a
-					href="https://nuxt.com/docs"
-					class="flex items-center font-medium underline transition-colors underline-offset-4 hover:text-black/70"
-				>
-					<img src="/nuxt.svg" class="h-6 mx-2" />
-					<p>Nuxt</p>
-				</a>
-				.
-			</div>
-			<div class="flex flex-col items-center justify-center">
-				<a href="https://vercel.com">
-					<img src="/vercel.svg" alt="Vercel Logo" class="h-4 my-2 text-white" />
-				</a>
-				<a
-					href="https://github.com/StephDietz/nuxt-ai-chat"
-					class="flex items-center font-medium underline transition-colors underline-offset-4 hover:text-black/70"
-				>
-					<img src="/github.svg" alt="GitHub Logo" class="h-4" />
-					<p class="ml-1">Source</p>
-				</a>
-			</div>
+		
 		</div>
-	</div>
+	
 </template>
 
 <style>
